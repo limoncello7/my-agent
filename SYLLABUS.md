@@ -14,6 +14,9 @@
 | `memory` | 记忆持久化 | `@modelcontextprotocol/server-memory` |
 | `filesystem` | 文件系统访问 (Desktop, Documents) | `@modelcontextprotocol/server-filesystem` |
 | `chrome-devtools` | Chrome DevTools 集成 (调试、截图、性能分析) | `chrome-devtools-mcp@latest` |
+| `stock-analysis` | A股数据查询（财务/概念/板块/情绪/涨停） | 本地 MCP (`mcp_stock_repo/mcp_stock-main/server.py`) |
+
+> **Note**: `stock-analysis` MCP 依赖 `fastmcp`, `adata`, `akshare` 等 Python 包，目前因 `crawl4ai` 缺失导致 F10 工具未加载，核心功能（财务/概念/板块）已就绪。
 
 ---
 
@@ -58,6 +61,12 @@
 | [`to-prd`](.claude/skills/to-prd/SKILL.md) | 将当前会话上下文整理为 PRD 并发布到 issue tracker | 需要创建 PRD 时 |
 | [`triage`](.claude/skills/triage/SKILL.md) | 通过状态机驱动的问题分类流程 | 创建/分类/审查 issues 时 |
 
+### 2.6 金融分析
+
+| Skill | 描述 | 触发场景 |
+|-------|------|----------|
+| [`stock-escape-monitor`](skills/stock-escape-monitor/SKILL.md) | A股个股出逃行情与主力资金异动实时监控分析 | 分析股票下跌风险、主力资金、部署本地监控脚本 |
+
 ---
 
 ## 三、快速参考
@@ -85,6 +94,9 @@
 
 # 进入极简模式
 caveman mode
+
+# 股票出逃分析（自动触发关键词：股票、主力、出逃、监控脚本）
+stock-escape-monitor
 ```
 
 ### MCP 能力速查
@@ -95,6 +107,7 @@ caveman mode
 - **文件系统**: `filesystem` server 访问 Desktop/Documents
 - **浏览器**: `chrome-devtools` server 驱动 Chrome 进行调试、截图、性能分析
 - **推理**: `sequential-thinking` server 支持复杂问题的分步推理
+- **股票数据**: `stock-analysis` MCP 提供财务指标、同花顺概念、板块强度、市场情绪、涨停信息
 
 ---
 
@@ -106,7 +119,10 @@ caveman mode
 | MCP Servers (补充配置) | `~/.claude.json` |
 | Skills 目录 | `~/.claude/skills/` |
 | 记忆文件 | `~/.claude/projects/C--Users-D1405/memory/` |
+| 本地代码仓库 | `~/my-agent/` |
+| 监控脚本 | `~/my-agent/stock-monitor/` |
+| 自定义 Skill | `~/my-agent/skills/stock-escape-monitor/` |
 
 ---
 
-*Generated on 2026-05-28*
+*Generated on 2026-05-30*
