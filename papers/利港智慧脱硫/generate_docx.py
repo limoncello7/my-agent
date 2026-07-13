@@ -3,8 +3,10 @@
 
 from docx import Document
 from docx.shared import Pt, Cm
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
 from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from copy import deepcopy
 
 doc = Document()
 
@@ -18,6 +20,25 @@ for section in doc.sections:
     section.bottom_margin = Cm(2.54)
     section.left_margin = Cm(3.17)
     section.right_margin = Cm(3.17)
+
+
+def set_two_columns(section):
+    """Set two-column layout on a section."""
+    sect_pr = section._sectPr
+    cols = sect_pr.find(qn('w:cols'))
+    if cols is None:
+        cols = OxmlElement('w:cols')
+        sect_pr.append(cols)
+    cols.set(qn('w:num'), '2')
+    cols.set(qn('w:space'), '480')  # space between columns in twips (~0.85cm)
+
+
+def add_column_break():
+    """Insert a column break."""
+    p = doc.add_paragraph()
+    run = p.add_run()
+    run._element.append(OxmlElement('w:br'))
+    run._element[-1].set(qn('w:type'), 'column')
 
 
 def set_font(run, name_cn='宋体', name_en='Times New Roman', size=10.5, bold=False):
@@ -161,8 +182,8 @@ def add_table(headers, rows):
 # BUILD DOCUMENT
 # ============================================================
 add_title('利港智慧脱硫系统研究与分析')
-add_author('（此处填写作者姓名）')
-add_affiliation('（上海鉴智软件技术有限公司，上海 200000）')
+add_author('董祥晖¹，任政达²')
+add_affiliation('（浙江浙能科技环保集团股份有限公司，浙江省杭州市 310000）')
 
 # Abstract
 p_abs = add_abstract_label()
@@ -179,6 +200,14 @@ add_abstract_body(p_abs,
     '与不足，并从算法优化、系统集成、数据智能和硬件可靠性四个维度提出了具体的改良方向。'
 )
 add_keywords()
+
+# Insert continuous section break for two-column body
+new_section = doc.add_section()
+new_section.start_type = 0  # continuous section break
+# Copy page setup from first section
+for key in ['page_width', 'page_height', 'top_margin', 'bottom_margin', 'left_margin', 'right_margin']:
+    setattr(new_section, key, getattr(doc.sections[0], key))
+set_two_columns(new_section)
 
 # ============================================================
 # 0 引言  (maps to original Chapter 1 content)
